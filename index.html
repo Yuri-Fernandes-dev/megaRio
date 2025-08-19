@@ -220,6 +220,59 @@
             margin: 0.5rem 0;
             font-weight: bold;
         }
+        
+        .ronda-modal-content {
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .ronda-checkpoints-list {
+            margin: 1rem 0;
+        }
+        
+        .checkpoint-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .checkpoint-item:last-child {
+            border-bottom: none;
+        }
+        
+        .checkpoint-checkbox {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .checkpoint-text {
+            flex: 1;
+        }
+        
+        .ronda-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.3rem 0.6rem;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .ronda-button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .extra-action-container {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #ccc;
+        }
 
         .section-nav {
             display: flex;
@@ -383,17 +436,70 @@
             </div>
         </div>
     </div>
+    
+    <div class="reset-modal" id="rondaModal">
+        <div class="modal-content ronda-modal-content">
+            <h2 class="modal-title" id="rondaModalTitle">Ronda - 23h</h2>
+            <div id="rondaCheckpointsList" class="ronda-checkpoints-list">
+                <!-- Checkpoints serão inseridos via JavaScript -->
+            </div>
+            <div id="extraActionContainer" class="extra-action-container" style="display: none;">
+                <div class="task-item">
+                    <input type="checkbox" class="task-checkbox" id="extraActionCheckbox">
+                    <div class="task-text" id="extraActionText">Ação adicional</div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-cancel" id="cancelRonda">Fechar</button>
+                <button class="btn btn-confirm" id="completeRonda">Concluir Ronda</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Definição das tarefas
             const tasks = [
-                { id: 1, time: '23h', description: 'Fazer ronda (Quina armazém, Palhetes, Palhetes 2, Portão do fim do armazém, Caixa d\'água, Parede caixa d\'água, Coluna churrasco, Bebedouro, Armazém transpaleteira, Ponto ao lado do quadro de luz, Último armazém à direita)' },
-                { id: 2, time: '2h', description: 'Fazer ronda novamente (mesmos pontos)' },
-                { id: 3, time: '4h', description: 'Fazer ronda novamente + Tirar cadeado do portão para os carros entrarem' },
-                { id: 4, time: '4h15', description: 'Ir no Sergio e fazer vistoria nos armários' },
-                { id: 5, time: '5h', description: 'Arrumar o balcão do café' },
-                { id: 6, time: '6h', description: 'Passar detector de metais, ligar motor 201, ligar quadro do armazém, ligar todos os postos (201, 241, 221) e mandar foto no grupo' }
+                { 
+                    id: 1, 
+                    time: '23h', 
+                    description: 'Fazer ronda', 
+                    isRonda: true,
+                    extraAction: null
+                },
+                { 
+                    id: 2, 
+                    time: '2h', 
+                    description: 'Fazer ronda novamente', 
+                    isRonda: true,
+                    extraAction: null
+                },
+                { 
+                    id: 3, 
+                    time: '4h', 
+                    description: 'Fazer ronda novamente', 
+                    isRonda: true,
+                    extraAction: 'Tirar cadeado do portão para os carros entrarem'
+                },
+                { id: 4, time: '4h15', description: 'Ir no Sergio e fazer vistoria nos armários', isRonda: false, extraAction: null },
+                { id: 5, time: '5h', description: 'Arrumar o balcão do café', isRonda: false, extraAction: null },
+                { id: 6, time: '5h30', description: 'Tirar a trava do portão para as pessoas entrarem a pé', isRonda: false, extraAction: null },
+                { id: 7, time: '6h', description: 'Passar detector de metais, ligar motor 201, ligar quadro do armazém, ligar todos os postos (201, 241, 221) e mandar foto no grupo', isRonda: false, extraAction: null }
+            ];
+            
+            // Definição dos postos de ronda
+            const rondaCheckpoints = [
+                { id: 'p1', name: 'Quina armazém' },
+                { id: 'p2', name: 'Palhetes' },
+                { id: 'p3', name: 'Palhetes 2' },
+                { id: 'p4', name: 'Portão do fim do armazém' },
+                { id: 'p5', name: 'Caixa d\'água' },
+                { id: 'p6', name: 'Parede caixa d\'água' },
+                { id: 'p7', name: 'Coluna churrasco' },
+                { id: 'p8', name: 'Bebedouro' },
+                { id: 'p9', name: 'Armazém transpaleteira' },
+                { id: 'p10', name: 'Ponto ao lado do quadro de luz' },
+                { id: 'p11', name: 'Último armazém à direita' }
             ];
 
             // Elementos DOM
@@ -402,6 +508,19 @@
             const resetModal = document.getElementById('resetModal');
             const cancelReset = document.getElementById('cancelReset');
             const confirmReset = document.getElementById('confirmReset');
+            
+            // Elementos do modal de ronda
+            const rondaModal = document.getElementById('rondaModal');
+            const rondaModalTitle = document.getElementById('rondaModalTitle');
+            const rondaCheckpointsList = document.getElementById('rondaCheckpointsList');
+            const cancelRonda = document.getElementById('cancelRonda');
+            const completeRonda = document.getElementById('completeRonda');
+            const extraActionContainer = document.getElementById('extraActionContainer');
+            const extraActionCheckbox = document.getElementById('extraActionCheckbox');
+            const extraActionText = document.getElementById('extraActionText');
+            
+            // Variáveis para controle da ronda atual
+            let currentRondaTaskId = null;
 
             // Carregar estado das tarefas do localStorage
             function loadTasksState() {
@@ -412,6 +531,17 @@
             // Salvar estado das tarefas no localStorage
             function saveTasksState(tasksState) {
                 localStorage.setItem('megaRioTasks', JSON.stringify(tasksState));
+            }
+            
+            // Carregar estado dos checkpoints de ronda do localStorage
+            function loadRondaState() {
+                const savedRonda = localStorage.getItem('megaRioRonda');
+                return savedRonda ? JSON.parse(savedRonda) : {};
+            }
+            
+            // Salvar estado dos checkpoints de ronda no localStorage
+            function saveRondaState(rondaState) {
+                localStorage.setItem('megaRioRonda', JSON.stringify(rondaState));
             }
 
             // Renderizar lista de tarefas
@@ -427,13 +557,26 @@
                     li.className = `task-item ${isCompleted ? 'completed' : ''}`;
                     li.dataset.id = task.id;
                     
-                    li.innerHTML = `
+                    let taskContent = `
                         <input type="checkbox" class="task-checkbox" ${isCompleted ? 'checked' : ''}>
                         <div class="task-text">
                             <span class="task-time">${task.time}</span>
                             ${task.description}
-                        </div>
                     `;
+                    
+                    if (task.isRonda) {
+                        taskContent += `
+                            <button class="ronda-button" data-task-id="${task.id}">Ver Postos</button>
+                        `;
+                        
+                        if (task.extraAction) {
+                            taskContent += `<br><small>${task.extraAction}</small>`;
+                        }
+                    }
+                    
+                    taskContent += `</div>`;
+                    
+                    li.innerHTML = taskContent;
                     
                     taskList.appendChild(li);
                 });
@@ -442,6 +585,96 @@
                 document.querySelectorAll('.task-checkbox').forEach(checkbox => {
                     checkbox.addEventListener('change', handleTaskToggle);
                 });
+                
+                // Adicionar event listeners para os botões de ronda
+                document.querySelectorAll('.ronda-button').forEach(button => {
+                    button.addEventListener('click', handleRondaButtonClick);
+                });
+            }
+            
+            // Abrir modal de ronda
+            function openRondaModal(taskId) {
+                const task = tasks.find(t => t.id === taskId);
+                if (!task || !task.isRonda) return;
+                
+                currentRondaTaskId = taskId;
+                
+                // Atualizar título do modal
+                rondaModalTitle.textContent = `Ronda - ${task.time}`;
+                
+                // Carregar estado dos checkpoints
+                const rondaState = loadRondaState();
+                const checkpointsState = rondaState[taskId] || {};
+                
+                // Renderizar checkpoints
+                rondaCheckpointsList.innerHTML = '';
+                rondaCheckpoints.forEach(checkpoint => {
+                    const isChecked = checkpointsState[checkpoint.id] === true;
+                    
+                    const div = document.createElement('div');
+                    div.className = 'checkpoint-item';
+                    div.innerHTML = `
+                        <input type="checkbox" class="checkpoint-checkbox" id="${checkpoint.id}" ${isChecked ? 'checked' : ''}>
+                        <div class="checkpoint-text">${checkpoint.name}</div>
+                    `;
+                    
+                    rondaCheckpointsList.appendChild(div);
+                });
+                
+                // Configurar ação extra, se houver
+                if (task.extraAction) {
+                    extraActionContainer.style.display = 'block';
+                    extraActionText.textContent = task.extraAction;
+                    extraActionCheckbox.checked = checkpointsState.extraAction === true;
+                } else {
+                    extraActionContainer.style.display = 'none';
+                }
+                
+                // Exibir modal
+                rondaModal.style.display = 'flex';
+            }
+            
+            // Salvar estado da ronda atual
+            function saveCurrentRondaState() {
+                if (currentRondaTaskId === null) return;
+                
+                const rondaState = loadRondaState();
+                const checkpointsState = {};
+                
+                // Salvar estado dos checkpoints
+                document.querySelectorAll('.checkpoint-checkbox').forEach(checkbox => {
+                    checkpointsState[checkbox.id] = checkbox.checked;
+                });
+                
+                // Salvar estado da ação extra, se houver
+                if (extraActionContainer.style.display !== 'none') {
+                    checkpointsState.extraAction = extraActionCheckbox.checked;
+                }
+                
+                rondaState[currentRondaTaskId] = checkpointsState;
+                saveRondaState(rondaState);
+                
+                // Verificar se todos os checkpoints estão marcados
+                const allChecked = Object.values(checkpointsState).every(value => value === true);
+                
+                // Atualizar estado da tarefa principal
+                if (allChecked) {
+                    const tasksState = loadTasksState();
+                    tasksState[currentRondaTaskId] = true;
+                    saveTasksState(tasksState);
+                    renderTasks();
+                }
+                
+                // Fechar modal
+                rondaModal.style.display = 'none';
+                currentRondaTaskId = null;
+            }
+            
+            // Manipular clique no botão de ronda
+            function handleRondaButtonClick(e) {
+                e.preventDefault();
+                const taskId = parseInt(e.target.dataset.taskId);
+                openRondaModal(taskId);
             }
 
             // Manipular toggle de tarefa
@@ -466,6 +699,7 @@
             // Resetar todas as tarefas
             function resetTasks() {
                 saveTasksState({});
+                saveRondaState({});
                 renderTasks();
                 resetModal.style.display = 'none';
             }
@@ -481,10 +715,36 @@
             
             confirmReset.addEventListener('click', resetTasks);
             
-            // Fechar modal ao clicar fora dele
+            // Event listeners para o modal de ronda
+            cancelRonda.addEventListener('click', () => {
+                saveCurrentRondaState();
+                rondaModal.style.display = 'none';
+            });
+            
+            completeRonda.addEventListener('click', () => {
+                // Marcar todos os checkpoints como concluídos
+                document.querySelectorAll('.checkpoint-checkbox').forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+                
+                // Se houver ação extra, marcar como concluída também
+                if (extraActionContainer.style.display !== 'none') {
+                    extraActionCheckbox.checked = true;
+                }
+                
+                saveCurrentRondaState();
+            });
+            
+            // Fechar modais ao clicar fora deles
             resetModal.addEventListener('click', (e) => {
                 if (e.target === resetModal) {
                     resetModal.style.display = 'none';
+                }
+            });
+            
+            rondaModal.addEventListener('click', (e) => {
+                if (e.target === rondaModal) {
+                    saveCurrentRondaState();
                 }
             });
 
