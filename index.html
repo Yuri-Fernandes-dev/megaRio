@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MegaRio - Controle de Segurança</title>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #4285f4;
+            --success-color: #0f9d58;
+            --danger-color: #db4437;
+            --warning-color: #f4b400;
+            --light-color: #f8f9fa;
+            --dark-color: #202124;
+            --gray-color: #5f6368;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: var(--dark-color);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--box-shadow);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.8rem 1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-checkbox {
+            margin-right: 10px;
+            margin-top: 5px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .task-text {
+            flex: 1;
+        }
+
+        .task-time {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+
+        .completed .task-text {
+            text-decoration: line-through;
+            color: var(--success-color);
+        }
+
+        .key-item, .rule-item {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+        }
+
+        .key-item:last-child, .rule-item:last-child {
+            border-bottom: none;
+        }
+
+        .key-name {
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 120px;
+        }
+
+        .reset-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .reset-btn:hover {
+            background-color: #c53929;
+        }
+
+        .reset-btn:active {
+            transform: scale(0.95);
+        }
+
+        .reset-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-title {
+            margin-bottom: 1rem;
+            color: var(--danger-color);
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .btn-cancel {
+            background-color: #e0e0e0;
+            color: var(--dark-color);
+        }
+
+        .btn-confirm {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background-color: #d0d0d0;
+        }
+
+        .btn-confirm:hover {
+            background-color: #c53929;
+        }
+
+        .highlight {
+            background-color: #fff9c4;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            font-weight: bold;
+        }
+
+        .section-nav {
+            display: flex;
+            overflow-x: auto;
+            background-color: white;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 60px;
+            z-index: 90;
+        }
+
+        .section-nav a {
+            padding: 0.5rem 1rem;
+            white-space: nowrap;
+            color: var(--gray-color);
+            text-decoration: none;
+            border-radius: 20px;
+        }
+
+        .section-nav a:hover {
+            background-color: #f0f0f0;
+        }
+
+        @media (max-width: 600px) {
+            .card-header {
+                padding: 0.6rem 0.8rem;
+            }
+
+            .card-body {
+                padding: 0.8rem;
+            }
+
+            .key-name {
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MegaRio - Controle de Segurança</h1>
+    </header>
+
+    <div class="container">
+        <div class="section-nav">
+            <a href="#checklist">📋 Checklist</a>
+            <a href="#keys">🔑 Chaves</a>
+            <a href="#rules">🚚 Regras</a>
+            <a href="#deliveries">📦 Entregas</a>
+            <a href="#notes">📝 Observações</a>
+        </div>
+
+        <div class="card" id="checklist">
+            <div class="card-header">
+                📋 Checklist de Horários
+            </div>
+            <div class="card-body">
+                <ul class="task-list" id="taskList">
+                    <!-- Tarefas serão inseridas via JavaScript -->
+                </ul>
+            </div>
+        </div>
+
+        <div class="card" id="keys">
+            <div class="card-header">
+                🔑 Controle de Chaves
+            </div>
+            <div class="card-body">
+                <div class="key-item">
+                    <div class="key-name">Chave 14</div>
+                    <div class="key-description">Padeiro</div>
+                </div>
+                <div class="key-item">
+                    <div class="key-name">Chave 23</div>
+                    <div class="key-description">Lojunha</div>
+                </div>
+                <div class="key-item">
+                    <div class="key-name">Chave amarela</div>
+                    <div class="key-description">Supervisor de transporte</div>
+                </div>
+                <div class="key-item">
+                    <div class="key-name">Chave 5</div>
+                    <div class="key-description">Estoque (só supervisor pode pegar e precisa lançar no grupo do WhatsApp)</div>
+                </div>
+                <div class="key-item">
+                    <div class="key-name">Chave preta</div>
+                    <div class="key-description">Portão automático</div>
+                </div>
+                <div class="key-item">
+                    <div class="key-name">Chave QDG</div>
+                    <div class="key-description">Quadro de luz</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="rules">
+            <div class="card-header">
+                🚚 Regras para Caminhoneiros e Funcionários
+            </div>
+            <div class="card-body">
+                <div class="rule-item">
+                    <div class="rule-text">Caminhoneiros só podem ir ao banheiro, ao pátio ou ficar no caminhão.</div>
+                </div>
+                <div class="rule-item">
+                    <div class="rule-text">Caminhoneiros só de calça.</div>
+                </div>
+                <div class="rule-item">
+                    <div class="rule-text">Funcionários podem entrar de bermuda, mas devem ir direto para o vestiário.</div>
+                </div>
+                <div class="rule-item">
+                    <div class="rule-text">Carretas precisam apresentar papel para verificar se estão autorizadas.</div>
+                </div>
+                <div class="rule-item">
+                    <div class="rule-text">Quando houver ressalva, pedir autorização no grupo da portaria.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="deliveries">
+            <div class="card-header">
+                📦 Regras de Entregas
+            </div>
+            <div class="card-body">
+                <div class="rule-item">
+                    <div class="rule-text"><strong>Mercado Livre</strong> → não aceitar, somente em horário de expediente.</div>
+                </div>
+                <div class="rule-item">
+                    <div class="rule-text"><strong>Mega Rio</strong> → aceitar em qualquer horário.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="notes">
+            <div class="card-header">
+                📝 Observações Especiais
+            </div>
+            <div class="card-body">
+                <div class="rule-item">
+                    <div class="rule-text">Aos domingos → tem dedetização, preciso fazer vídeos.</div>
+                </div>
+                <div class="rule-item">
+                    <div class="highlight">Às 6h é obrigatório ligar todos os postos (201, 241, 221) e mandar foto no grupo.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="reset-btn" id="resetBtn" title="Resetar Checklist">↺</button>
+
+    <div class="reset-modal" id="resetModal">
+        <div class="modal-content">
+            <h2 class="modal-title">Resetar Checklist</h2>
+            <p>Tem certeza que deseja resetar todas as tarefas do checklist?</p>
+            <p>Esta ação não pode ser desfeita.</p>
+            <div class="modal-buttons">
+                <button class="btn btn-cancel" id="cancelReset">Cancelar</button>
+                <button class="btn btn-confirm" id="confirmReset">Resetar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Definição das tarefas
+            const tasks = [
+                { id: 1, time: '23h', description: 'Fazer ronda (Quina armazém, Palhetes, Palhetes 2, Portão do fim do armazém, Caixa d\'água, Parede caixa d\'água, Coluna churrasco, Bebedouro, Armazém transpaleteira, Ponto ao lado do quadro de luz, Último armazém à direita)' },
+                { id: 2, time: '2h', description: 'Fazer ronda novamente (mesmos pontos)' },
+                { id: 3, time: '4h', description: 'Fazer ronda novamente + Tirar cadeado do portão para os carros entrarem' },
+                { id: 4, time: '4h15', description: 'Ir no Sergio e fazer vistoria nos armários' },
+                { id: 5, time: '5h', description: 'Arrumar o balcão do café' },
+                { id: 6, time: '6h', description: 'Passar detector de metais, ligar motor 201, ligar quadro do armazém, ligar todos os postos (201, 241, 221) e mandar foto no grupo' }
+            ];
+
+            // Elementos DOM
+            const taskList = document.getElementById('taskList');
+            const resetBtn = document.getElementById('resetBtn');
+            const resetModal = document.getElementById('resetModal');
+            const cancelReset = document.getElementById('cancelReset');
+            const confirmReset = document.getElementById('confirmReset');
+
+            // Carregar estado das tarefas do localStorage
+            function loadTasksState() {
+                const savedTasks = localStorage.getItem('megaRioTasks');
+                return savedTasks ? JSON.parse(savedTasks) : {};
+            }
+
+            // Salvar estado das tarefas no localStorage
+            function saveTasksState(tasksState) {
+                localStorage.setItem('megaRioTasks', JSON.stringify(tasksState));
+            }
+
+            // Renderizar lista de tarefas
+            function renderTasks() {
+                const tasksState = loadTasksState();
+                
+                taskList.innerHTML = '';
+                
+                tasks.forEach(task => {
+                    const isCompleted = tasksState[task.id] === true;
+                    
+                    const li = document.createElement('li');
+                    li.className = `task-item ${isCompleted ? 'completed' : ''}`;
+                    li.dataset.id = task.id;
+                    
+                    li.innerHTML = `
+                        <input type="checkbox" class="task-checkbox" ${isCompleted ? 'checked' : ''}>
+                        <div class="task-text">
+                            <span class="task-time">${task.time}</span>
+                            ${task.description}
+                        </div>
+                    `;
+                    
+                    taskList.appendChild(li);
+                });
+                
+                // Adicionar event listeners para os checkboxes
+                document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', handleTaskToggle);
+                });
+            }
+
+            // Manipular toggle de tarefa
+            function handleTaskToggle(e) {
+                const taskItem = e.target.closest('.task-item');
+                const taskId = parseInt(taskItem.dataset.id);
+                const isCompleted = e.target.checked;
+                
+                // Atualizar visual
+                if (isCompleted) {
+                    taskItem.classList.add('completed');
+                } else {
+                    taskItem.classList.remove('completed');
+                }
+                
+                // Atualizar estado no localStorage
+                const tasksState = loadTasksState();
+                tasksState[taskId] = isCompleted;
+                saveTasksState(tasksState);
+            }
+
+            // Resetar todas as tarefas
+            function resetTasks() {
+                saveTasksState({});
+                renderTasks();
+                resetModal.style.display = 'none';
+            }
+
+            // Event listeners
+            resetBtn.addEventListener('click', () => {
+                resetModal.style.display = 'flex';
+            });
+            
+            cancelReset.addEventListener('click', () => {
+                resetModal.style.display = 'none';
+            });
+            
+            confirmReset.addEventListener('click', resetTasks);
+            
+            // Fechar modal ao clicar fora dele
+            resetModal.addEventListener('click', (e) => {
+                if (e.target === resetModal) {
+                    resetModal.style.display = 'none';
+                }
+            });
+
+            // Navegação suave para as seções
+            document.querySelectorAll('.section-nav a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 120,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Inicializar a aplicação
+            renderTasks();
+        });
+    </script>
+</body>
+</html>
