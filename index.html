@@ -350,7 +350,7 @@
                 </div>
                 <div class="key-item">
                     <div class="key-name">Chave 23</div>
-                    <div class="key-description">Lojunha</div>
+                    <div class="key-description">Lojinha</div>
                 </div>
                 <div class="key-item">
                     <div class="key-name">Chave amarela</div>
@@ -460,31 +460,19 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Definição das tarefas
             const tasks = [
-                { 
-                    id: 1, 
-                    time: '23h', 
-                    description: 'Fazer ronda', 
-                    isRonda: true,
-                    extraAction: null
-                },
-                { 
-                    id: 2, 
-                    time: '2h', 
-                    description: 'Fazer ronda novamente', 
-                    isRonda: true,
-                    extraAction: null
-                },
-                { 
-                    id: 3, 
-                    time: '4h', 
-                    description: 'Fazer ronda novamente', 
-                    isRonda: true,
-                    extraAction: 'Tirar cadeado do portão para os carros entrarem'
-                },
-                { id: 4, time: '4h15', description: 'Ir no Sergio e fazer vistoria nos armários', isRonda: false, extraAction: null },
-                { id: 5, time: '5h', description: 'Arrumar o balcão do café', isRonda: false, extraAction: null },
-                { id: 6, time: '5h30', description: 'Tirar a trava do portão para as pessoas entrarem a pé', isRonda: false, extraAction: null },
-                { id: 7, time: '6h', description: 'Passar detector de metais, ligar motor 201, ligar quadro do armazém, ligar todos os postos (201, 241, 221) e mandar foto no grupo', isRonda: false, extraAction: null }
+                { id: 1, time: '19h', description: 'Dar o pronto no grupo', isRonda: false, extraAction: null },
+                { id: 2, time: '19h40', description: 'Fechar o portão dos pedestres', isRonda: false, extraAction: null },
+                { id: 3, time: '23h', description: 'Fazer ronda', isRonda: true, extraAction: null },
+                { id: 4, time: '23h50', description: 'Revista da janta dentro do armazém', isRonda: false, extraAction: null },
+                { id: 5, time: '2h', description: 'Fazer ronda novamente', isRonda: true, extraAction: null },
+                { id: 6, time: '4h', description: 'Fazer ronda novamente', isRonda: true, extraAction: 'Tirar cadeado do portão para os carros entrarem' },
+                { id: 7, time: '4h15', description: 'Ir no Sergio e fazer vistoria nos armários', isRonda: false, extraAction: null },
+                { id: 8, time: '5h', description: 'Arrumar o balcão do café', isRonda: false, extraAction: null },
+                { id: 9, time: '5h30', description: 'Tirar a trava do portão para as pessoas entrarem a pé', isRonda: false, extraAction: null },
+                { id: 10, time: '6h', description: 'Passar detector de metais', isRonda: false, extraAction: null },
+                { id: 11, time: '6h5', description: 'Desligar o refletor dentro da guarita', isRonda: false, extraAction: null },
+                { id: 12, time: '6h30', description: 'Ligar quadro do armazém, ligar todos os postos (201, 241, 221) e mandar foto no grupo', isRonda: false, extraAction: null },
+                { id: 13, time: '6h30', description: 'Ligar motor 201 no refeitório', isRonda: false, extraAction: null }
             ];
             
             // Definição dos postos de ronda
