@@ -221,6 +221,55 @@
             font-weight: bold;
         }
         
+        /* Estilos para os modelos de WhatsApp */
+        .template-section {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .template-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .template-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .template-content {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            border: 1px solid #ddd;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .copy-btn.copied {
+            background-color: var(--success-color);
+        }
+        
         .ronda-modal-content {
             max-width: 500px;
             max-height: 80vh;
@@ -322,6 +371,7 @@
     <div class="container">
         <div class="section-nav">
             <a href="#checklist">📋 Checklist</a>
+            <a href="#whatsapp-templates">💬 Modelos</a>
             <a href="#keys">🔑 Chaves</a>
             <a href="#rules">🚚 Regras</a>
             <a href="#deliveries">📦 Entregas</a>
@@ -418,6 +468,73 @@
                 </div>
                 <div class="rule-item">
                     <div class="highlight">Às 6h é obrigatório ligar todos os postos (201, 241, 221) e mandar foto no grupo.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="whatsapp-templates">
+            <div class="card-header">
+                💬 Modelos para WhatsApp
+            </div>
+            <div class="card-body">
+                <div class="template-section">
+                    <h3>Assumindo o posto de serviço</h3>
+                    <div class="template-content" id="template-assumindo">
+Boa Noite a Todos!
+Vigilante - Yuri Fernandes
+Mat: 28687
+
+Apoio:
+
+Assumindo plantão no posto MegaRio / Sem alteração
+                    </div>
+                    <button class="copy-btn" data-template="assumindo">Copiar</button>
+                </div>
+
+                <div class="template-section">
+                    <h3>Ronda Finalizada</h3>
+                    <div class="template-content" id="template-ronda">
+Ronda Finalizada / Sem alteração
+                    </div>
+                    <button class="copy-btn" data-template="ronda">Copiar</button>
+                </div>
+
+                <div class="template-section">
+                    <h3>Câmara Fria</h3>
+                    <div class="template-content" id="template-camara">
+Cãmaria fria 241 Ligada
+Cãmaria fria 221 Ligada
+Cãmaria fria 201 Ligada
+Exteran Ligada
+                    </div>
+                    <button class="copy-btn" data-template="camara">Copiar</button>
+                </div>
+
+                <div class="template-section">
+                    <h3>Revista de Armários</h3>
+                    <div class="template-content" id="template-revista">
+Revista de Armários dos funcionarios em Destaques acompanhado com o supervisor:
+
+Termino:
+
+Sem Altera
+                    </div>
+                    <button class="copy-btn" data-template="revista">Copiar</button>
+                </div>
+
+                <div class="template-section">
+                    <h3>Entrada de Veículo</h3>
+                    <div class="template-content" id="template-veiculo">
+Transportadora: 
+
+Carga: 
+
+Cavalo: 
+Carreta: 
+
+Descarga Agendada para o dia
+                    </div>
+                    <button class="copy-btn" data-template="veiculo">Copiar</button>
                 </div>
             </div>
         </div>
@@ -725,6 +842,32 @@
                 }
                 
                 saveCurrentRondaState();
+            });
+            
+            // Funcionalidade para copiar modelos de WhatsApp
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const templateId = this.getAttribute('data-template');
+                    const templateContent = document.getElementById('template-' + templateId).innerText;
+                    
+                    // Copiar para a área de transferência
+                    navigator.clipboard.writeText(templateContent)
+                        .then(() => {
+                            // Feedback visual
+                            this.textContent = 'Copiado!';
+                            this.classList.add('copied');
+                            
+                            // Restaurar o botão após 2 segundos
+                            setTimeout(() => {
+                                this.textContent = 'Copiar';
+                                this.classList.remove('copied');
+                            }, 2000);
+                        })
+                        .catch(err => {
+                            console.error('Erro ao copiar texto: ', err);
+                            alert('Não foi possível copiar o texto. Por favor, tente novamente.');
+                        });
+                });
             });
             
             // Fechar modais ao clicar fora deles
